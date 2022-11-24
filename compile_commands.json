@@ -1,0 +1,86 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/clang",
+      "-std=c11",
+      "-Wall",
+      "-Wextra",
+      "-O2",
+      "-fsanitize=undefined,address",
+      "-I/usr/local/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-framework",
+      "OpenGL",
+      "-c",
+      "-o",
+      "build/src/main.c.o",
+      "src/main.c"
+    ],
+    "directory": "/Users/guillaume/Documents/repos/back-to-c/traka",
+    "file": "/Users/guillaume/Documents/repos/back-to-c/traka/src/main.c",
+    "output": "/Users/guillaume/Documents/repos/back-to-c/traka/build/src/main.c.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang",
+      "-std=c11",
+      "-Wall",
+      "-Wextra",
+      "-O2",
+      "-fsanitize=undefined,address",
+      "-I/usr/local/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-framework",
+      "OpenGL",
+      "-c",
+      "-o",
+      "build/src/tracker.c.o",
+      "src/tracker.c"
+    ],
+    "directory": "/Users/guillaume/Documents/repos/back-to-c/traka",
+    "file": "/Users/guillaume/Documents/repos/back-to-c/traka/src/tracker.c",
+    "output": "/Users/guillaume/Documents/repos/back-to-c/traka/build/src/tracker.c.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang",
+      "-std=c11",
+      "-Wall",
+      "-Wextra",
+      "-O2",
+      "-fsanitize=undefined,address",
+      "-I/usr/local/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-framework",
+      "OpenGL",
+      "-c",
+      "-o",
+      "build/src/audio.c.o",
+      "src/audio.c"
+    ],
+    "directory": "/Users/guillaume/Documents/repos/back-to-c/traka",
+    "file": "/Users/guillaume/Documents/repos/back-to-c/traka/src/audio.c",
+    "output": "/Users/guillaume/Documents/repos/back-to-c/traka/build/src/audio.c.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang",
+      "-std=c11",
+      "-Wall",
+      "-Wextra",
+      "-O2",
+      "-fsanitize=undefined,address",
+      "-I/usr/local/include/SDL2",
+      "-D_THREAD_SAFE",
+      "-framework",
+      "OpenGL",
+      "-c",
+      "-o",
+      "build/src/app.c.o",
+      "src/app.c"
+    ],
+    "directory": "/Users/guillaume/Documents/repos/back-to-c/traka",
+    "file": "/Users/guillaume/Documents/repos/back-to-c/traka/src/app.c",
+    "output": "/Users/guillaume/Documents/repos/back-to-c/traka/build/src/app.c.o"
+  }
+]
