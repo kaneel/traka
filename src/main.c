@@ -63,8 +63,8 @@ int main(int argc, char *argv[]) {
       .loop = {
         .mode = Loop_PINGPONG,
         .start = 500,
-        .end = smps.list[1].wav_len - 1
-      } 
+        .end = 1000
+      }
     },
     { 
       .name = "hat" , 
@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
       .loop = {
         .mode = Loop_FORWARD,
         .start = 0,
-        .end = smps.list[1].wav_len - 1
+        .end = 2000
       }
     },
     { .name = "clap" , .filename = "clap.wav" },
@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
       .loop = {
         .mode = Loop_REVERSE,
         .start = 500,
-        .end = smps.list[1].wav_len - 1
+        .end = 2000
       }
     }
   };
@@ -178,7 +178,7 @@ int main(int argc, char *argv[]) {
         draw_pattern_view(&callbackData, pat, currentCursor);
         break;
       case View_SAMPLES: 
-        draw_sample_view(&smps);
+        draw_sample_view(&smps, &playbacks);
         break;
       default: 
         break;

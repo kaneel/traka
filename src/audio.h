@@ -3,7 +3,41 @@
 
 #include <SDL.h>
 #include <stdbool.h>
-#include "sample.h" 
+typedef enum LoopMode {
+
+  Loop_OFF, 
+  Loop_FORWARD,
+  Loop_REVERSE,
+  Loop_PINGPONG
+} LoopMode;
+
+typedef struct Loop {
+  LoopMode mode;
+  Uint32 start;
+  Uint32 end;
+} Loop;
+
+typedef struct SampleDefinition {
+  char name[256];
+  char filename[256];
+  Loop loop;
+} SampleDefinition;
+
+typedef struct Sample {
+  char * name;
+  char * filename;
+  SDL_AudioSpec wav_spec;
+  Uint32 wav_len;
+  float * wav_buffer;
+  short bit_depth;
+  short size;
+  Loop loop;
+} Sample;
+
+typedef struct SampleList {
+  Sample list[512];
+  short count;
+} SampleList;
 
 typedef struct Playback {
   Uint32 play_cursor;

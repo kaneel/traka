@@ -42,38 +42,21 @@ bool GUI_behaviour(GUIElement * element, bool force_false) {
   return force_false ? false : ret;
 }
 
-bool GUI_Slider(GUIElement * element) {
-  bool clicked = GUI_behaviour(element, false);
-
+void GUI_Slider(GUIElement * element, Uint32 min, Uint32 max) {
   int x;
   if (element->state.pressed) {
     SDL_GetMouseState(&x, NULL);
-    element->dimensions[0] = x;
+    element->dimensions[0] = MAX(min, MIN(max, x));
   }
-
-  nvgRect(app.nvg, element->dimensions[0], element->dimensions[1], element->dimensions[2], element->dimensions[3]);
-
-  nvgFillColor(app.nvg, theme.graphMarkers);
-  nvgStrokeWidth(app.nvg, 2.f);
-  nvgFill(app.nvg);
-
-  nvgFontFace(app.nvg, "regular");
-  nvgFontSize(app.nvg, 22.0f);
-  nvgTextAlign(app.nvg, NVG_ALIGN_LEFT|NVG_ALIGN_MIDDLE);
-
-  nvgFillColor(app.nvg, theme.textColour);
-  nvgText(app.nvg, element->dimensions[0], element->dimensions[1] + 10, element->text, NULL);
-
-  return clicked;
 }
 
 
-bool GUI_Button(GUIElement element, bool is_pressed) {
-  float * dimensions = element.dimensions;
-  bool clicked = GUI_behaviour(&element, is_pressed);
+bool GUI_Button(GUIElement * element, bool is_pressed) {
+  float * dimensions = element->dimensions;
+  bool clicked = GUI_behaviour(element, is_pressed);
 
   NVGcolor nvg_stroke_color = theme.boxStroke;
-  NVGcolor nvg_fill_color = is_pressed || element.state.hover ? theme.buttonBackgroundHover : theme.buttonBackground;
+  NVGcolor nvg_fill_color = is_pressed || element->state.hover ? theme.buttonBackgroundHover : theme.buttonBackground;
   
   nvgBeginPath(app.nvg); 
 
@@ -92,17 +75,17 @@ bool GUI_Button(GUIElement element, bool is_pressed) {
   nvgFill(app.nvg);
 
   nvgFillColor(app.nvg, theme.textColour);
-  nvgText(app.nvg, dimensions[0], y + 10, element.text, NULL);
+  nvgText(app.nvg, dimensions[0], y + 10, element->text, NULL);
 
   return clicked;
 }
 
-bool GUI_ComboBox(GUIElement element, bool is_pressed) {
-  float * dimensions = element.dimensions;
+bool GUI_ComboBox(GUIElement * element, bool is_pressed) {
+  float * dimensions = element->dimensions;
 
-  bool clicked = GUI_behaviour(&element, is_pressed);
+  bool clicked = GUI_behaviour(element, is_pressed);
   NVGcolor nvg_stroke_color = theme.boxStroke;
-  NVGcolor nvg_fill_color = is_pressed || element.state.hover ? theme.buttonBackgroundHover : theme.buttonBackground;
+  NVGcolor nvg_fill_color = is_pressed || element->state.hover ? theme.buttonBackgroundHover : theme.buttonBackground;
   
   nvgBeginPath(app.nvg); 
 
@@ -119,41 +102,41 @@ bool GUI_ComboBox(GUIElement element, bool is_pressed) {
   nvgFill(app.nvg);
 
   nvgFillColor(app.nvg, theme.textColour);
-  nvgText(app.nvg, dimensions[0], dimensions[1] + 10, element.text, NULL);
+  nvgText(app.nvg, dimensions[0], dimensions[1] + 10, element->text, NULL);
 
   return clicked;
 }
 
-bool GUI_TextButton(GUIElement element, bool is_pressed) {
+bool GUI_TextButton(GUIElement * element, bool is_pressed) {
   nvgBeginPath(app.nvg); 
-  float * dimensions = element.dimensions;
+  float * dimensions = element->dimensions;
   float bounds[4] = { 0 };
 
   nvgFontFace(app.nvg, "regular");
   nvgFontSize(app.nvg, 22.0f);
 
-  nvgTextBounds(app.nvg, element.dimensions[0], dimensions[1], element.text, NULL, bounds);
+  nvgTextBounds(app.nvg, element->dimensions[0], dimensions[1], element->text, NULL, bounds);
 
   dimensions[2] = bounds[2] - bounds[0];
   dimensions[3] = bounds[3] - bounds[1];
 
-  bool clicked = GUI_behaviour(&element, is_pressed);
+  bool clicked = GUI_behaviour(element, is_pressed);
 
   nvgTextAlign(app.nvg, NVG_ALIGN_LEFT|NVG_ALIGN_MIDDLE);
   if (is_pressed)
     nvgFillColor(app.nvg, theme.textActiveColour);
-  else if (element.state.hover)
+  else if (element->state.hover)
     nvgFillColor(app.nvg, theme.textActiveColour);
   else
     nvgFillColor(app.nvg, theme.textColour);
-  nvgText(app.nvg, element.dimensions[0], element.dimensions[1], element.text, NULL);
+  nvgText(app.nvg, element->dimensions[0], element->dimensions[1], element->text, NULL);
 
   return clicked;
 }
 
-bool GUI_Input(GUIElement element, bool is_focused) {
-  float * dimensions = element.dimensions;
-  bool clicked = GUI_behaviour(&element, is_focused);
+bool GUI_Input(GUIElement * element, bool is_focused) {
+  float * dimensions = element->dimensions;
+  bool clicked = GUI_behaviour(element, is_focused);
 
   NVGcolor nvg_stroke_color = theme.boxStroke;
   NVGcolor nvg_fill_color = theme.inputBackground;
@@ -175,7 +158,7 @@ bool GUI_Input(GUIElement element, bool is_focused) {
   nvgFill(app.nvg);
 
   char text[256];
-  convert_to_string(text, element.numericValue);
+  convert_to_string(text, element->numericValue);
 
   nvgFillColor(app.nvg, theme.textColour);
   nvgText(app.nvg, dimensions[0], y + 10, text, NULL);

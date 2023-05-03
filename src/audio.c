@@ -16,7 +16,7 @@ float FREQUENCIES[12][9] = {
 };
 
 void audio_callback(void* userdata, unsigned char * s, int len) {
-  CallbackData *callbackData = (CallbackData *)userdata;
+  CallbackData * callbackData = (CallbackData *)userdata;
   PlaybackList * playbacks = callbackData->playbacks;
   ChannelList * channels = callbackData->channels;
 
@@ -67,18 +67,18 @@ void audio_callback(void* userdata, unsigned char * s, int len) {
         actual_cursor = s->loop.end - (actual_cursor - cursor);
       }
 
-      if (s->loop.mode == Loop_REVERSE && p.direction == true && actual_cursor >= s->loop.end) {
+      if (s->loop.mode == Loop_REVERSE && actual_cursor >= s->loop.end) {
         p.direction = !p.direction;
-        actual_cursor = actual_cursor - (actual_cursor - s->loop.end);
+        actual_cursor = s->loop.end - (actual_cursor - s->loop.end);
       }
 
       if (s->loop.mode == Loop_REVERSE && p.direction == false && actual_cursor <= s->loop.start) {
         actual_cursor = s->loop.end - (s->loop.start - actual_cursor);
       }
 
-      if (s->loop.mode == Loop_PINGPONG && p.direction == true && actual_cursor >= s->loop.end) {
+      if (s->loop.mode == Loop_PINGPONG && actual_cursor >= s->loop.end) {
         p.direction = !p.direction;
-        actual_cursor = s->loop.end - (actual_cursor - cursor);
+        actual_cursor = s->loop.end - (actual_cursor - s->loop.end);
       }
 
       if (s->loop.mode == Loop_PINGPONG && p.direction == false && actual_cursor <= s->loop.start) {

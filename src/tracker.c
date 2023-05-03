@@ -115,9 +115,6 @@ static char * NUMBERS[11] = {
 };
 
 static GUIElement GUISoundBox = {
-  .state = (GUIElementState){
-    .focus = false
-  },
   .text = "Audio",
   .dimensions = { 500.0, 20.0, 60.0, 22.0 }
 };
@@ -764,96 +761,110 @@ void draw_pattern(Pattern * pat, Cursor cursor) {
   }
 }
 
-void draw_tracker_ui(CallbackData * callbackData) {
-  int x = 20.0;
-  int y = 20.0;
+GUIElement PlayButton = {
+  .dimensions = { 20.0, 20.0, 60.0, 22.0},    
+  .text = "play",
+};
 
-  if (GUI_Button((GUIElement){
-    .dimensions = { x, y, 60.0, 22.0},    
-    .text = "play",
-    .state = { 0, 0, 0 }
-  }, app_state.is_playing)) {
+GUIElement StopButton = {
+  .dimensions = { 80.0, 20, 60.0, 22.0},    
+  .text = "stop",
+};
+
+GUIElement BPMMinButton = {
+  .dimensions = { 200, 20, 10.0, 22.0 },
+  .text = "-",
+};
+
+GUIElement BPMPlusButton = {
+  .dimensions = { 250, 20, 10.0, 22.0 },
+  .text = "+",
+};
+
+GUIElement LPBMinButton = {
+  .dimensions = { 300, 20, 10.0, 22.0},
+  .text = "-"
+};
+
+GUIElement LPBPlusButton = {
+  .dimensions = { 350, 20, 10.0, 22.0},
+  .text = "+"
+};
+
+GUIElement InstrMinButton = {
+  .dimensions = { 400, 20, 10.0, 22.0},
+  .text = "-"
+};
+
+GUIElement InstrPlusButton = {
+  .dimensions = { 450, 20, 10.0, 22.0},
+  .text = "+"
+};
+
+GUIElement InstrInput = {
+  .dimensions = { 410, 20, 40.0, 22.0}
+};
+
+GUIElement BPMInput = {
+  .dimensions = { 210, 20, 40.0, 22.0}
+};
+
+GUIElement LBPInput = {
+  .dimensions = { 310, 20, 40.0, 22.0}
+};
+
+void draw_tracker_ui(CallbackData * callbackData) {
+  InstrInput.numericValue = app_state.last_instrument_used;
+  BPMInput.numericValue = app_state.bpm;
+  LBPInput.numericValue = app_state.lpb;
+
+  if (GUI_Button(&PlayButton, app_state.is_playing)) {
     app_state.is_playing = true;
   }
 
-  if (GUI_Button((GUIElement){
-    .dimensions = { x += 60.0, y, 60.0, 22.0},    
-    .text = "stop",
-    .state = { 0, 0, 0 }
-  }, !app_state.is_playing)) {
+  if (GUI_Button(&StopButton, !app_state.is_playing)) {
     app_state.is_playing = false;
   }
 
   // BLOCK BPM
-  x = 200.0;
-  if (GUI_Button((GUIElement){
-    .dimensions = { x, y, 10.0, 22.0 },
-    .text = "-",
-    .state = { 0, 0, 0 }
-  }, false)) {
+  if (GUI_Button(&BPMMinButton, false)) {
     if (app_state.bpm > 1) {
       app_state.bpm -= 1;
     }
   }
-  GUI_Input((GUIElement){
-    .dimensions = { x += 10.0, y, 40.0, 22.0},    
-    .numericValue = app_state.bpm
-  }, false);
-  if (GUI_Button((GUIElement){
-    .dimensions = { x +40, y, 10.0, 22.0},    
-    .text = "+"
-  }, false)) {
+  GUI_Input(&BPMInput, false);
+  if (GUI_Button(&BPMPlusButton, false)) {
     if (app_state.bpm < 512) {
       app_state.bpm += 1;
     }
   }
 
-  x = 300.0;
-  if (GUI_Button((GUIElement){
-    .dimensions = { x, y, 10.0, 22.0},    
-    .text = "-"
-  }, false)) {
+  if (GUI_Button(&LPBMinButton, false)) {
     if (app_state.lpb > 1) {
       app_state.lpb -= 1;
     }
   }
-  GUI_Input((GUIElement){
-    .dimensions = { x += 10.0, y, 40.0, 22.0},    
-    .numericValue = app_state.lpb
-  },false);
-  if (GUI_Button((GUIElement){
-    .dimensions = { x += 40.0, y, 10.0, 22.0},    
-    .text = "+"
-  }, false)) {
+  GUI_Input(&LBPInput,false);
+  if (GUI_Button(&LPBPlusButton, false)) {
     if (app_state.lpb < 64) {
       app_state.lpb += 1;
     }
   }
 
-  x = 400.0;
-  if (GUI_Button((GUIElement){
-    .dimensions = { x, y, 10.0, 22.0},    
-    .text = "-"
-  }, false)) {
+  if (GUI_Button(&InstrMinButton, false)) {
     if (app_state.last_instrument_used > 0) {
       app_state.last_instrument_used -= 1;
     }
   }
-  GUI_Input((GUIElement){
-    .dimensions = { x += 10.0, y, 40.0, 22.0},    
-    .numericValue = app_state.last_instrument_used
-  }, false);
-  if (GUI_Button((GUIElement){
-    .dimensions = { x += 40.0, y, 10.0, 22.0},    
-    .text = "+"
-  }, false)) {
+  GUI_Input(&InstrInput, false);
+  if (GUI_Button(&InstrPlusButton, false)) {
     if (app_state.last_instrument_used < 99) {
       app_state.last_instrument_used += 1;
     }
   }
 
-  x = 500.0;
-  if (GUI_ComboBox(GUISoundBox, false)) {
+  int x = 500.0;
+  if (GUI_ComboBox(&GUISoundBox, false)) {
     GUISoundBox.state.focus = !GUISoundBox.state.focus;
   }
 
@@ -871,10 +882,12 @@ void draw_tracker_ui(CallbackData * callbackData) {
     unsigned short count = SDL_GetNumAudioDevices(0);
 
     for (unsigned short i = 0; i < count; ++i) {
-      if (GUI_TextButton(( GUIElement ) {
+      GUIElement SoundBoxItem = {
         .text = (char *)SDL_GetAudioDeviceName(i, 0),
         .dimensions = { x, 52 + (22 * i), 0, 0 }
-      }, app_state.audio_device_id == i)) {
+      };
+
+      if (GUI_TextButton(&SoundBoxItem, app_state.audio_device_id == i)) {
         app_state.audio_device_id = i;
         SDL_PauseAudioDevice(app.audio_device_id, 1);
         set_audio_device(app_state.audio_device_id, audio_callback, callbackData);
@@ -897,7 +910,6 @@ void draw_pattern_view(CallbackData * callbackData, Pattern * pattern, Cursor cu
 
   nvgBeginPath(app.nvg);
 
-  // background
   nvgStrokeColor(app.nvg, nvgRGBAf(0.5f, 0.f, 0.f, 1.0f));
   nvgFillColor(app.nvg, nvgRGBAf(0.9f, 0.9f, 0.9f, 1.0f));
   nvgRect(app.nvg, zone_x - 20, zone_y - 50, zone_w + 40, zone_h + 60);

@@ -1,5 +1,6 @@
 #include <unistd.h>
 #include "app.h"
+#include "audio.h"
 #include "gui.h"
 #include "theme.h"
 #include "sample.h"
@@ -99,9 +100,17 @@ void load_samples(SampleList * smps, SampleDefinition * smps_list, short len) {
     strcat(sample_path, smps_list[i].filename);
 
     Sample sample = load_sample(sample_path, smps_list[i].name, smps_list[i].filename);
-    smps->list[smps->count++] = sample;
 
-    sample.loop = smps_list[i].loop;
+    if (smps_list[i].loop.mode == 0) {
+      sample.loop = (Loop){
+        .mode = Loop_OFF,
+        .start = 0,
+        .end = sample.wav_len
+      };
+    } else {
+      sample.loop = smps_list[i].loop;
+    }
+    smps->list[smps->count++] = sample;
   }
 }
 
@@ -133,7 +142,7 @@ void draw_sample_list(SampleList * samples) {
   }
 }
 
-void draw_sample(Sample * sample) {
+void draw_sample(Sample * sample, PlaybackList * playbacks) {
   nvgBeginPath(app.nvg);
   nvgStrokeWidth(app.nvg, 1.0);
 
@@ -164,7 +173,7 @@ void draw_sample(Sample * sample) {
   nvgStroke(app.nvg);
 
   /*
-   * draw the markers
+   * draw the loop markers
    */
   if (sample->loop.mode != Loop_OFF) {
     Uint32 start = floor((float)sample->loop.start * ratioS);
@@ -182,7 +191,8 @@ void draw_sample(Sample * sample) {
     SliderStart.dimensions[1] = MIDDLE + SAMPLE_HEIGHT - 20;
     SliderStart.dimensions[2] = 20;
     SliderStart.dimensions[3] = 20;
-    GUI_Slider(&SliderStart);
+    GUI_Button(&SliderStart, false);
+    GUI_Slider(&SliderStart, 100, AVAIL_WIDTH + 100);
 
     nvgBeginPath(app.nvg);
     nvgStrokeColor(app.nvg, theme.graphMarkers);
@@ -194,7 +204,8 @@ void draw_sample(Sample * sample) {
     SliderEnd.dimensions[1] = MIDDLE + SAMPLE_HEIGHT - 20;
     SliderEnd.dimensions[2] = 20;
     SliderEnd.dimensions[3] = 20;
-    GUI_Slider(&SliderEnd);
+    GUI_Button(&SliderEnd, false);
+    GUI_Slider(&SliderEnd, 100, AVAIL_WIDTH + 100);
 
     float start_pos = SliderStart.dimensions[0] - LEFT_COL_WIDTH;
     float end_pos = SliderEnd.dimensions[0] - LEFT_COL_WIDTH + 20;
@@ -209,34 +220,46 @@ void draw_sample(Sample * sample) {
       sample->loop.end = MIN(sample->wav_len, final_e);
     }
   }
+
+  /*
+   * draw playback heads
+   */
+  for (short i = 0; i < playbacks->count; i++) {
+    Playback playback = playbacks->list[i];
+
+    if (!playback.set || playback.sample != sample) {
+      break;
+    }
+
+    Uint32 cursor = floor((float)playback.play_cursor * ratioS);
+    nvgBeginPath(app.nvg);
+    nvgStrokeColor(app.nvg, theme.graphMarkers);
+    nvgMoveTo(app.nvg, LEFT_COL_WIDTH + cursor, MIDDLE - SAMPLE_HEIGHT);
+    nvgLineTo(app.nvg, LEFT_COL_WIDTH + cursor, MIDDLE + SAMPLE_HEIGHT);
+    nvgStroke(app.nvg);
+  }
 }
 
 void draw_sample_ui(Sample * sample) {
-  if (GUI_Button(LoopOffButton, sample->loop.mode == Loop_OFF)) {
+  if (GUI_Button(&LoopOffButton, sample->loop.mode == Loop_OFF)) {
     sample->loop.mode = Loop_OFF;
   }
 
-  if (GUI_Button(LoopForwardButton, sample->loop.mode == Loop_FORWARD)) {
+  if (GUI_Button(&LoopForwardButton, sample->loop.mode == Loop_FORWARD)) {
     sample->loop.mode = Loop_FORWARD;
-    sample->loop.start = 0;
-    sample->loop.end = sample->wav_len;
   }
 
-  if (GUI_Button(LoopPingPongButton, sample->loop.mode == Loop_PINGPONG)) {
+  if (GUI_Button(&LoopPingPongButton, sample->loop.mode == Loop_PINGPONG)) {
     sample->loop.mode = Loop_PINGPONG;
-    sample->loop.start = 0;
-    sample->loop.end = sample->wav_len;
   }
 
-  if (GUI_Button(LoopReverseButton, sample->loop.mode == Loop_REVERSE)) {
+  if (GUI_Button(&LoopReverseButton, sample->loop.mode == Loop_REVERSE)) {
     sample->loop.mode = Loop_REVERSE;
-    sample->loop.start = sample->wav_len / 2;
-    sample->loop.end = sample->wav_len;
   }
 }
 
-void draw_sample_view(SampleList * samples) {
+void draw_sample_view(SampleList * samples, PlaybackList * playbacks) {
   draw_sample_list(samples);
-  draw_sample(&samples->list[app_state.current_sample]);
+  draw_sample(&samples->list[app_state.current_sample], playbacks);
   draw_sample_ui(&samples->list[app_state.current_sample]);
 }
